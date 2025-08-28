@@ -6,6 +6,11 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		1C5D52042E60544600436391 /* WebRTC in Frameworks */ = {isa = PBXBuildFile; productRef = 1C5D52032E60544600436391 /* WebRTC */; };
+		1C5D52072E60546E00436391 /* Starscream in Frameworks */ = {isa = PBXBuildFile; productRef = 1C5D52062E60546E00436391 /* Starscream */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		1C5D51DA2E60535D00436391 /* WebRTCP2PFileSharing.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WebRTCP2PFileSharing.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -23,6 +28,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1C5D52042E60544600436391 /* WebRTC in Frameworks */,
+				1C5D52072E60546E00436391 /* Starscream in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -65,6 +72,8 @@
 			);
 			name = WebRTCP2PFileSharing;
 			packageProductDependencies = (
+				1C5D52032E60544600436391 /* WebRTC */,
+				1C5D52062E60546E00436391 /* Starscream */,
 			);
 			productName = WebRTCP2PFileSharing;
 			productReference = 1C5D51DA2E60535D00436391 /* WebRTCP2PFileSharing.app */;
@@ -94,6 +103,10 @@
 			);
 			mainGroup = 1C5D51D12E60535D00436391;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				1C5D52022E60544600436391 /* XCRemoteSwiftPackageReference "WebRTC" */,
+				1C5D52052E60546E00436391 /* XCRemoteSwiftPackageReference "Starscream" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 1C5D51DB2E60535D00436391 /* Products */;
 			projectDirPath = "";
@@ -324,6 +337,38 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		1C5D52022E60544600436391 /* XCRemoteSwiftPackageReference "WebRTC" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/stasel/WebRTC.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 139.0.0;
+			};
+		};
+		1C5D52052E60546E00436391 /* XCRemoteSwiftPackageReference "Starscream" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/daltoniam/Starscream.git";
+			requirement = {
+				kind = exactVersion;
+				version = 4.0.4;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		1C5D52032E60544600436391 /* WebRTC */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 1C5D52022E60544600436391 /* XCRemoteSwiftPackageReference "WebRTC" */;
+			productName = WebRTC;
+		};
+		1C5D52062E60546E00436391 /* Starscream */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 1C5D52052E60546E00436391 /* XCRemoteSwiftPackageReference "Starscream" */;
+			productName = Starscream;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 1C5D51D22E60535D00436391 /* Project object */;
 }
