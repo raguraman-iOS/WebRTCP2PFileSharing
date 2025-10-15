@@ -13,6 +13,7 @@ protocol WebRTCClientDelegate: AnyObject {
     func webRTCClient(_ client: WebRTCClient, didDiscoverLocalCandidate candidate: RTCIceCandidate)
     func webRTCClient(_ client: WebRTCClient, didChangeConnectionState state: RTCIceConnectionState)
     func webRTCClient(_ client: WebRTCClient, didReceiveData data: Data)
+    func webRTCClient(_ client: WebRTCClient,didOpen dataChannel: RTCDataChannel)
 }
 
 final class WebRTCClient: NSObject {
@@ -35,15 +36,15 @@ final class WebRTCClient: NSObject {
     private var videoCapturer: RTCVideoCapturer?
     private var localVideoTrack: RTCVideoTrack?
     private var remoteVideoTrack: RTCVideoTrack?
-    private var localDataChannel: RTCDataChannel?
-    private var remoteDataChannel: RTCDataChannel?
+    var localDataChannel: RTCDataChannel?
+    var remoteDataChannel: RTCDataChannel?
 
     @available(*, unavailable)
     override init() {
         fatalError("WebRTCClient:init is unavailable")
     }
     
-    required init(iceServers: [String]) {
+    required init(iceServers: [String], turnServer: TurnServers) {
         let config = RTCConfiguration()
         config.iceServers = [RTCIceServer(urlStrings: iceServers)]
         
@@ -203,6 +204,30 @@ final class WebRTCClient: NSObject {
         let buffer = RTCDataBuffer(data: data, isBinary: true)
         self.remoteDataChannel?.sendData(buffer)
     }
+    
+    // MARK: - Connection Management
+    
+    func disconnect() {
+        // Close data channels
+        localDataChannel?.close()
+        remoteDataChannel?.close()
+        localDataChannel = nil
+        remoteDataChannel = nil
+        
+        // Close peer connection
+        peerConnection.close()
+        
+        // Reset connection state
+        debugPrint("WebRTC connection closed")
+    }
+    
+    var isConnected: Bool {
+        return peerConnection.connectionState == .connected
+    }
+    
+    var connectionState: RTCPeerConnectionState {
+        return peerConnection.connectionState
+    }
 }
 
 extension WebRTCClient: RTCPeerConnectionDelegate {
@@ -243,6 +268,27 @@ extension WebRTCClient: RTCPeerConnectionDelegate {
     func peerConnection(_ peerConnection: RTCPeerConnection, didOpen dataChannel: RTCDataChannel) {
         debugPrint("peerConnection did open data channel")
         self.remoteDataChannel = dataChannel
+        self.delegate?.webRTCClient(self, didOpen: dataChannel)
+    }
+    
+    func peerConnection(_ peerConnection: RTCPeerConnection, didChange newState: RTCPeerConnectionState) {
+        debugPrint("peerConnection new state: \(newState)")
+        
+        // Handle connection state changes
+        switch newState {
+        case .connected:
+            debugPrint("WebRTC peer connection established")
+        case .disconnected, .failed, .closed:
+            debugPrint("WebRTC peer connection closed/failed")
+            // Notify delegate about connection state change
+            DispatchQueue.main.async {
+                self.delegate?.webRTCClient(self, didChangeConnectionState: .closed)
+            }
+        case .new, .connecting:
+            debugPrint("WebRTC peer connection connecting...")
+        @unknown default:
+            debugPrint("WebRTC peer connection unknown state: \(newState)")
+        }
     }
 }
 extension WebRTCClient {
@@ -320,9 +366,19 @@ extension WebRTCClient {
 extension WebRTCClient: RTCDataChannelDelegate {
     func dataChannelDidChangeState(_ dataChannel: RTCDataChannel) {
         debugPrint("dataChannel did change state: \(dataChannel.readyState)")
+        
+        // Check if data channel is closed
+        if dataChannel.readyState == .closed {
+            // Update connection status when data channel closes
+            DispatchQueue.main.async {
+                // Notify delegate about connection state change
+                self.delegate?.webRTCClient(self, didChangeConnectionState: .closed)
+            }
+        }
     }
     
     func dataChannel(_ dataChannel: RTCDataChannel, didReceiveMessageWith buffer: RTCDataBuffer) {
+        debugPrint("dataChannel didReceiveMessage data \(buffer.data)")
         self.delegate?.webRTCClient(self, didReceiveData: buffer.data)
     }
 }

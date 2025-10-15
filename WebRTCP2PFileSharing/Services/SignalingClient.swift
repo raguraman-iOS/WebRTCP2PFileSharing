@@ -54,6 +54,10 @@ final class SignalingClient {
             debugPrint("Warning: Could not encode candidate: \(error)")
         }
     }
+    
+    func disconnect() {
+//        self.webSocket.disconnect()
+    }
 }
 
 
