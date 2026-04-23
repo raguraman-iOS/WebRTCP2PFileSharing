@@ -2,6 +2,14 @@
 
 A comprehensive iOS application for peer-to-peer file sharing using WebRTC technology. This app provides both sender and receiver functionality in a single interface.
 
+### Why I Started This Project
+- To demonstrate that files can be transferred peer-to-peer over WebRTC `RTCDataChannel`.
+- To show WebRTC is more than calls: `MediaStreams` (audio/video), `RTCDataChannel` (reliable data like files/chat), and screen sharing.
+- For file transfer, this project focuses on reliable/ordered delivery so data arrives intact.
+
+### Project Goal
+- A simple, practical demo of reliable WebRTC data transfer on iOS.
+
 ## App Demo Video
 
 Sample video demonstrating app flow:
@@ -99,10 +107,26 @@ Make sure both sender and receiver clients are on the same network and can reach
 - **ObservableObject**: Reactive data binding
 - **Protocol-Oriented**: Clean separation of concerns
 
-### Why I Started This Project
-- To demonstrate that files can be transferred peer-to-peer over WebRTC `RTCDataChannel`.
-- To show WebRTC is more than calls: `MediaStreams` (audio/video), `RTCDataChannel` (reliable data like files/chat), and screen sharing.
-- For file transfer, this project focuses on reliable/ordered delivery so data arrives intact.
+
+
+### Future Enhancements
+- **Security**: Add encryption and authentication
+- **File Validation**: Implement file type and size restrictions
+- **User Management**: Add user accounts and contact lists
+- **Transfer History**: Track completed transfers
+- **Background Transfers**: Support for background file operations
+
+## Background Transfer Note (Apple Guidance)
+
+Based on discussion with Apple Developer Technical Support:
+
+- Data-only WebRTC transfer can continue only while the app is still running in background.
+- Once iOS suspends the app, low-level networking (including WebRTC data channels) stops.
+- A short `UIApplication` background task can provide limited time to finish in-flight work.
+- For reliable transfer while the app is suspended, use supported background-capable APIs (for example, `URLSession` background sessions).
+
+Reference discussion:
+- [WebRTC Data Channel for Background File Transfer Without Audio/Video](https://developer.apple.com/forums/thread/799259)
 
 ## Usage
 
@@ -132,27 +156,6 @@ Make sure both sender and receiver clients are on the same network and can reach
 - **State Management**: Complete state handling for all scenarios
 - **Error Handling**: Comprehensive error states and user feedback
 
-### Project Goal
-- A simple, practical demo of reliable WebRTC data transfer on iOS.
-
-### Future Enhancements
-- **Security**: Add encryption and authentication
-- **File Validation**: Implement file type and size restrictions
-- **User Management**: Add user accounts and contact lists
-- **Transfer History**: Track completed transfers
-- **Background Transfers**: Support for background file operations
-
-## Background Transfer Note (Apple Guidance)
-
-Based on discussion with Apple Developer Technical Support:
-
-- Data-only WebRTC transfer can continue only while the app is still running in background.
-- Once iOS suspends the app, low-level networking (including WebRTC data channels) stops.
-- A short `UIApplication` background task can provide limited time to finish in-flight work.
-- For reliable transfer while the app is suspended, use supported background-capable APIs (for example, `URLSession` background sessions).
-
-Reference discussion:
-- [WebRTC Data Channel for Background File Transfer Without Audio/Video](https://developer.apple.com/forums/thread/799259)
 
 
 ## Requirements
