@@ -1127,9 +1127,9 @@ class FileSharingManager: ObservableObject {
         saveReceivedFiles()
         
         // Show file preview
-        fileToPreview = file
-        showingFilePreview = true
-        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: {[weak self] in
+            self?.showFilePreview(file)
+        })
         showToast("File received: \(file.name)", type: .success)
     }
     
@@ -1138,8 +1138,9 @@ class FileSharingManager: ObservableObject {
         guard isFileAccessible(file) else {
             // Try to recover the file first
             if tryToRecoverFile(file) {
-                // File was recovered, show it
-                fileToPreview = file
+                // File was recovered; use the updated entry with fixed URL.
+                let recoveredFile = receivedFiles.first(where: { $0.id == file.id }) ?? file
+                fileToPreview = recoveredFile
                 showingFilePreview = true
                 return
             }

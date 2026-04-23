@@ -81,14 +81,6 @@ struct ReceivedFilesHistoryView: View {
                 }
             }
         }
-        .sheet(isPresented: $fileSharingManager.showingFilePreview) {
-            if let file = fileSharingManager.fileToPreview {
-                FilePreviewView(file: file)
-                    .onDisappear {
-                        fileSharingManager.fileToPreview = nil
-                    }
-            }
-        }
         .actionSheet(isPresented: $showingSortOptions) {
             ActionSheet(
                 title: Text("Sort Files"),

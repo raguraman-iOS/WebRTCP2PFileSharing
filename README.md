@@ -122,9 +122,80 @@ A comprehensive iOS application for peer-to-peer file sharing using WebRTC techn
 ## Installation
 
 1. Clone the repository
-2. Open `WebRTCP2PFileSharing.xcodeproj` in Xcode
-3. Build and run on a device or simulator
-4. Grant necessary permissions when prompted
+2. Update signaling server URL in `WebRTCP2PFileSharing/Config.swift`
+   - Find:
+     ```swift
+     let defaultSignalingServerUrl = URL(string: "ws://your-machine-ip:8080")!
+     ```
+   - Replace `your-machine-ip` with your Mac's LAN IP, for example:
+     ```swift
+     let defaultSignalingServerUrl = URL(string: "ws://192.168.1.25:8080")!
+     ```
+3. Start the signaling server (required before running the iOS app)
+   ```bash
+   cd NodeJS
+   npm install
+   node app.js
+   ```
+   The server starts on port `8080` and prints available LAN IP URLs.
+4. Open `WebRTCP2PFileSharing.xcodeproj` in Xcode
+5. Build and run on a device or simulator
+6. Grant necessary permissions when prompted
+
+## Signaling Server (NodeJS)
+
+The signaling server is included in this repository under `NodeJS/`.
+
+### Start locally
+```bash
+cd NodeJS
+npm install
+node app.js
+```
+
+Expected output:
+```text
+Signaling server is now listening on port 8080
+Use one of these URLs in Config.swift:
+- ws://192.168.1.25:8080
+```
+
+### Update app configuration with your IP
+
+In `WebRTCP2PFileSharing/Config.swift`, update:
+
+```swift
+let defaultSignalingServerUrl = URL(string: "ws://your-machine-ip:8080")!
+```
+
+Use one of the printed IPs from `node app.js`.
+
+### Use the IP printed by the server
+
+When you run:
+
+```bash
+node app.js
+```
+
+the server prints available LAN signaling URLs, for example:
+
+```text
+Signaling server is now listening on port 8080
+Use one of these URLs in Config.swift:
+- ws://192.168.1.25:8080
+```
+
+Copy one of the printed `ws://<ip>:8080` values into `WebRTCP2PFileSharing/Config.swift`.
+Make sure both sender and receiver clients are on the same network and can reach this host/port.
+
+## App Demo Video
+
+Sample video demonstrating app flow:
+
+- Local file: `/Users/raguraman/Documents/WebRTCFileSharing.mov`
+
+For GitHub rendering, place the video in the repository (for example `assets/WebRTCFileSharing.mov`) and update the link here to that relative path.
 
 ## License
 
