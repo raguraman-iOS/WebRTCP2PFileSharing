@@ -104,7 +104,6 @@ A comprehensive iOS application for peer-to-peer file sharing using WebRTC techn
 - **Network Layer**: WebSocket infrastructure in place
 
 ### Future Enhancements
-- **Real WebRTC**: Implement actual P2P file transfer
 - **Security**: Add encryption and authentication
 - **File Validation**: Implement file type and size restrictions
 - **User Management**: Add user accounts and contact lists
@@ -122,7 +121,15 @@ A comprehensive iOS application for peer-to-peer file sharing using WebRTC techn
 ## Installation
 
 1. Clone the repository
-2. Update signaling server URL in `WebRTCP2PFileSharing/Config.swift`
+2. Start the signaling server (required before running the iOS app)
+   ```bash
+   cd NodeJS
+   npm install
+   node app.js
+   ```
+   The server starts on port `8080` and prints available LAN IP URLs.
+3. Open `WebRTCP2PFileSharing.xcodeproj` in Xcode
+4. Update signaling server URL in `WebRTCP2PFileSharing/Config.swift`
    - Find:
      ```swift
      let defaultSignalingServerUrl = URL(string: "ws://your-machine-ip:8080")!
@@ -131,14 +138,6 @@ A comprehensive iOS application for peer-to-peer file sharing using WebRTC techn
      ```swift
      let defaultSignalingServerUrl = URL(string: "ws://192.168.1.25:8080")!
      ```
-3. Start the signaling server (required before running the iOS app)
-   ```bash
-   cd NodeJS
-   npm install
-   node app.js
-   ```
-   The server starts on port `8080` and prints available LAN IP URLs.
-4. Open `WebRTCP2PFileSharing.xcodeproj` in Xcode
 5. Build and run on a device or simulator
 6. Grant necessary permissions when prompted
 
@@ -193,7 +192,9 @@ Make sure both sender and receiver clients are on the same network and can reach
 
 Sample video demonstrating app flow:
 
-- Local file: `/Users/raguraman/Documents/WebRTCFileSharing.mov`
+https://github.com/user-attachments/assets/519fe13f-914f-46e0-b55a-ae44b54458d6
+
+
 
 For GitHub rendering, place the video in the repository (for example `assets/WebRTCFileSharing.mov`) and update the link here to that relative path.
 
