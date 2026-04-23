@@ -9,6 +9,7 @@ import Foundation
 import SwiftUI
 import WebRTC
 import UniformTypeIdentifiers
+import UIKit
 
 enum UploadStatus: String, CaseIterable {
     case idle = "Idle"
@@ -144,6 +145,10 @@ class FileSharingManager: ObservableObject {
     private let signalClient: SignalingClient
     private var webRTCClient: WebRTCClient? = nil
     private var webRTCFileTransferClient: WebRTCFileTransferHandler? = nil
+    
+    // Background state tracking
+    private var wasUploadingBeforeBackground = false
+    private var wasDownloadingBeforeBackground = false
     
     init() {
         let config = Config.default
@@ -340,20 +345,25 @@ class FileSharingManager: ObservableObject {
     }
     
     func pauseUpload() {
-        uploadStatus = .paused
-        uploadTimer?.invalidate()
-        speedUpdateTimer?.invalidate()
+        // Call the WebRTC file transfer handler's pause method
+        webRTCFileTransferClient?.pauseUpload()
         
-        // Note: Don't clean up local file on pause, as user might resume
-        showToast("Upload paused", type: .info)
+        // Note: The uploadStatus will be updated via the delegate method uploadPaused()
+        // Don't clean up local file on pause, as user might resume
     }
     
     func resumeUpload() {
-        uploadStatus = .transferring
-        startUpload()
+        // Call the WebRTC file transfer handler's resume method
+        webRTCFileTransferClient?.resumeUpload()
+        
+        // Note: The uploadStatus will be updated via the delegate method uploadResumed()
     }
     
     func cancelUpload() {
+        // Call the WebRTC file transfer handler's cancel method
+        webRTCFileTransferClient?.cancelUpload()
+        
+        // Reset local state
         uploadStatus = .idle
         isUploading = false
         uploadProgress = 0.0
@@ -446,13 +456,9 @@ class FileSharingManager: ObservableObject {
     
     func resumeDownload() {
         downloadStatus = .downloading
-//        startDownload(for: IncomingFileRequest(
-//            fileName: currentDownload?.name ?? "Unknown",
-//            fileSize: currentDownload?.size ?? "0 KB",
-//            fileType: currentDownload?.type ?? "Unknown",
-//            senderId: "Unknown",
-//            timestamp: Date()
-//        ))
+        // Note: Downloads are handled by the WebRTCFileTransferHandler
+        // The actual resume logic is managed by the WebRTC layer
+        // This method only updates the UI state
     }
     
     func cancelDownload() {
@@ -929,12 +935,22 @@ class FileSharingManager: ObservableObject {
     }
     
     private func setupAppLifecycleNotifications() {
+        // Handle app entering background - pause uploads/downloads
+        NotificationCenter.default.addObserver(
+            forName: UIApplication.didEnterBackgroundNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            self?.handleAppDidEnterBackground()
+        }
+        
+        // Handle app entering foreground - resume uploads/downloads
         NotificationCenter.default.addObserver(
             forName: UIApplication.willEnterForegroundNotification,
             object: nil,
             queue: .main
         ) { [weak self] _ in
-            self?.refreshReceivedFiles()
+            self?.handleAppWillEnterForeground()
         }
         
         NotificationCenter.default.addObserver(
@@ -956,6 +972,51 @@ class FileSharingManager: ObservableObject {
     
     deinit {
         NotificationCenter.default.removeObserver(self)
+    }
+    
+    // MARK: - App Lifecycle Handlers
+    
+    private func handleAppDidEnterBackground() {
+        print("App entered background - pausing transfers if active")
+        
+        // Store current state before pausing
+        wasUploadingBeforeBackground = isUploading && uploadStatus == .transferring
+        wasDownloadingBeforeBackground = isDownloading && downloadStatus == .downloading
+        
+        // Pause upload if currently transferring
+        if wasUploadingBeforeBackground {
+            print("Pausing upload due to background")
+            pauseUpload()
+        }
+        
+        // Pause download if currently downloading
+        if wasDownloadingBeforeBackground {
+            print("Pausing download due to background")
+            pauseDownload()
+        }
+    }
+    
+    private func handleAppWillEnterForeground() {
+        print("App entering foreground - resuming transfers if they were active")
+        
+        // Resume upload if it was active before background
+        if wasUploadingBeforeBackground {
+            print("Resuming upload after foreground")
+            resumeUpload()
+        }
+        
+        // Resume download if it was active before background
+        if wasDownloadingBeforeBackground {
+            print("Resuming download after foreground")
+            resumeDownload()
+        }
+        
+        // Reset background state flags
+        wasUploadingBeforeBackground = false
+        wasDownloadingBeforeBackground = false
+        
+        // Refresh received files
+        refreshReceivedFiles()
     }
     
     private func saveReceivedFiles() {
@@ -1557,7 +1618,6 @@ extension FileSharingManager: WebRTCFileTransferDelegate {
                 self.pendingFileRequests.removeAll()
                 self.incomingFileRequests.removeAll()
                 self.uploadStatus = .idle
-                self.pendingFileRequests
                 self.uploadProgress = 0.0
                 self.uploadSpeed = "0 KB/s"
             }
