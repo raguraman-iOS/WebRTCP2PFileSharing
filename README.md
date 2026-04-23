@@ -57,25 +57,15 @@ Use one of these URLs in Config.swift:
 - ws://192.168.1.25:8080
 ```
 
-### Update app configuration with your IP
+### Configure app with printed server IP
 
-In `WebRTCP2PFileSharing/Config.swift`, update:
-
-```swift
-let defaultSignalingServerUrl = URL(string: "ws://your-machine-ip:8080")!
-```
-
-Use one of the printed IPs from `node app.js`.
-
-### Use the IP printed by the server
-
-When you run:
+Run:
 
 ```bash
 node app.js
 ```
 
-the server prints available LAN signaling URLs, for example:
+The server prints available LAN signaling URLs, for example:
 
 ```text
 Signaling server is now listening on port 8080
@@ -83,8 +73,13 @@ Use one of these URLs in Config.swift:
 - ws://192.168.1.25:8080
 ```
 
-Copy one of the printed `ws://<ip>:8080` values into `WebRTCP2PFileSharing/Config.swift`.
-Make sure both sender and receiver clients are on the same network and can reach this host/port.
+Then update `WebRTCP2PFileSharing/Config.swift`:
+
+```swift
+let defaultSignalingServerUrl = URL(string: "ws://your-machine-ip:8080")!
+```
+
+Replace `your-machine-ip` with one of the printed IPs. Make sure sender and receiver are on the same network and can reach port `8080`.
 
 ## Features
 
@@ -155,7 +150,6 @@ Reference discussion:
 - **UI Complete**: Full user interface implemented
 - **State Management**: Complete state handling for all scenarios
 - **Error Handling**: Comprehensive error states and user feedback
-
 
 
 ## Requirements
