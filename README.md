@@ -99,17 +99,10 @@ Make sure both sender and receiver clients are on the same network and can reach
 - **ObservableObject**: Reactive data binding
 - **Protocol-Oriented**: Clean separation of concerns
 
-### Core Services
-- **FileSharingManager**: Central business logic controller
-- **SignalingClient**: WebRTC signaling server communication
-- **WebSocketProvider**: Real-time communication layer
-- **File Management**: File selection, preview, and metadata
-
-### Data Models
-- **FileInfo**: File metadata and preview generation
-- **IncomingFileRequest**: Incoming transfer request details
-- **UploadStatus/DownloadStatus**: Transfer state management
-- **ToastType**: Notification categorization
+### Why I Started This Project
+- To demonstrate that files can be transferred peer-to-peer over WebRTC `RTCDataChannel`.
+- To show WebRTC is more than calls: `MediaStreams` (audio/video), `RTCDataChannel` (reliable data like files/chat), and screen sharing.
+- For file transfer, this project focuses on reliable/ordered delivery so data arrives intact.
 
 ## Usage
 
@@ -139,11 +132,8 @@ Make sure both sender and receiver clients are on the same network and can reach
 - **State Management**: Complete state handling for all scenarios
 - **Error Handling**: Comprehensive error states and user feedback
 
-### Integration Points
-- **WebRTC Client**: Ready for WebRTC implementation
-- **Signaling Server**: Prepared for real server communication
-- **File System**: Integrated with iOS file management
-- **Network Layer**: WebSocket infrastructure in place
+### Project Goal
+- A simple, practical demo of reliable WebRTC data transfer on iOS.
 
 ### Future Enhancements
 - **Security**: Add encryption and authentication
